@@ -29,7 +29,7 @@ export class Collapse implements OnInit {
   private isCollapsing:boolean = false;
 
   @Input('transition-duration')
-  private transitionDuration: number = 500; // Duration in ms
+  private transitionDuration: number = 250; // Duration in ms
 
   @Input()
   private set collapse(value:boolean) {
