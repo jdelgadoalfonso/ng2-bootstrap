@@ -7,13 +7,13 @@ import {AnimationBuilder} from 'angular2/src/animate/animation_builder';
 // TODO: add on change
 @Directive({selector: '[collapse]'})
 export class Collapse implements OnInit {
-  private animation:any;
+  private animation: any;
 
   // style
   // @HostBinding('style.height')
   // private height:string;
   @HostBinding('style.display')
-  private display:string;
+  private display: string;
   // shown
   @HostBinding('class.in')
   @HostBinding('attr.aria-expanded')
@@ -28,7 +28,8 @@ export class Collapse implements OnInit {
   @HostBinding('class.collapsing')
   private isCollapsing:boolean = false;
 
-  @Input() private transitionDuration:number = 500; // Duration in ms
+  @Input('transition-duration')
+  private transitionDuration: number = 500; // Duration in ms
 
   @Input()
   private set collapse(value:boolean) {
@@ -70,28 +71,27 @@ export class Collapse implements OnInit {
     this.isCollapsed = true;
 
     setTimeout(() => {
-        // this.height = '0';
-        // this.isCollapse = true;
-        // this.isCollapsing = false;
-        this.animation
-          .setFromStyles({
-            height: this._el.nativeElement.scrollHeight + 'px'
-          })
-          .setToStyles({
-            height: '0',
-            overflow: 'hidden'
-          });
+      // this.height = '0';
+      // this.isCollapse = true;
+      // this.isCollapsing = false;
+      this.animation
+        .setFromStyles({
+          height: this._el.nativeElement.scrollHeight + 'px'
+        })
+        .setToStyles({
+          height: '0',
+          overflow: 'hidden'
+        });
 
-        this.animation.start(this._el.nativeElement)
-          .onComplete(() => {
-            if (this._el.nativeElement.offsetHeight === 0) {
-              this.display = 'none';
-            }
+      this.animation.start(this._el.nativeElement).onComplete(() => {
+        if (this._el.nativeElement.offsetHeight === 0) {
+          this.display = 'none';
+        }
 
-            this.isCollapse = true;
-            this.isCollapsing = false;
-          });
-      }, 4);
+        this.isCollapse = true;
+        this.isCollapsing = false;
+      });
+    }, 4);
   }
 
   public show():void {
@@ -104,23 +104,30 @@ export class Collapse implements OnInit {
     this.display = '';
 
     setTimeout(() => {
-        // this.height = 'auto';
-        // this.isCollapse = true;
-        // this.isCollapsing = false;
-        this.animation
-          .setFromStyles({
-            height: this._el.nativeElement.offsetHeight,
-            overflow: 'hidden'
-          })
-          .setToStyles({
-            height: this._el.nativeElement.scrollHeight + 'px'
-          });
+      // this.height = 'auto';
+      // this.isCollapse = true;
+      // this.isCollapsing = false;
+      this.animation
+        .setFromStyles({
+          height: this._el.nativeElement.offsetHeight,
+          overflow: 'hidden'
+        })
+        .setToStyles({
+          height: this.calculateHeight()
+        });
 
-        this.animation.start(this._el.nativeElement)
-          .onComplete(() => {
-            this.isCollapse = true;
-            this.isCollapsing = false;
-          });
-      }, 4);
+      this.animation.start(this._el.nativeElement).onComplete(() => {
+        this.isCollapse = true;
+        this.isCollapsing = false;
+      });
+    }, 4);
+  }
+
+  private calculateHeight(): string {
+    let ret: string = this._el.nativeElement.scrollHeight + 'px';
+    if (this._el.nativeElement.scrollHeight === 0) {
+      ret = 'auto';
+    }
+    return ret;
   }
 }
