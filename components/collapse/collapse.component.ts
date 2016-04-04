@@ -43,11 +43,12 @@ export class Collapse implements OnInit {
 
   private _ab:AnimationBuilder;
   private _el:ElementRef;
+  private _firstShot: boolean;
 
   public constructor(_ab:AnimationBuilder, _el:ElementRef) {
     this._ab = _ab;
     this._el = _el;
-
+    this._firstShot = true;
   }
 
   public ngOnInit():void {
@@ -61,6 +62,7 @@ export class Collapse implements OnInit {
     } else {
       this.show();
     }
+    this._firstShot = false;
   }
 
   public hide():void {
@@ -70,12 +72,12 @@ export class Collapse implements OnInit {
     this.isExpanded = false;
     this.isCollapsed = true;
 
-    setTimeout(() => {
-      // this.height = '0';
-      // this.isCollapse = true;
-      // this.isCollapsing = false;
-      this.animation
-        .setFromStyles({
+    if (!this._firstShot) {
+      setTimeout(() => {
+        // this.height = '0';
+        // this.isCollapse = true;
+        // this.isCollapsing = false;
+        this.animation.setFromStyles({
           height: this._el.nativeElement.scrollHeight + 'px'
         })
         .setToStyles({
@@ -83,15 +85,20 @@ export class Collapse implements OnInit {
           overflow: 'hidden'
         });
 
-      this.animation.start(this._el.nativeElement).onComplete(() => {
-        if (this._el.nativeElement.offsetHeight === 0) {
-          this.display = 'none';
-        }
+        this.animation.start(this._el.nativeElement).onComplete(() => {
+          if (this._el.nativeElement.offsetHeight === 0) {
+            this.display = 'none';
+          }
 
-        this.isCollapse = true;
-        this.isCollapsing = false;
-      });
-    }, 4);
+          this.isCollapse = true;
+          this.isCollapsing = false;
+        });
+      }, 4);
+    } else {
+      this.display = 'none';
+      this.isCollapse = true;
+      this.isCollapsing = false;
+    }
   }
 
   public show():void {
