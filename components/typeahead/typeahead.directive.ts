@@ -1,6 +1,7 @@
 import {
   Directive, Input, Output, HostListener, EventEmitter, OnInit, ElementRef,
-  Renderer, DynamicComponentLoader, ComponentRef, Injector, provide
+  Renderer, DynamicComponentLoader, ComponentRef, ReflectiveInjector, provide,
+  ViewContainerRef
 } from 'angular2/core';
 import {NgModel} from 'angular2/common';
 import {TypeaheadUtils} from './typeahead-utils';
@@ -51,6 +52,7 @@ export class Typeahead implements OnInit {
 
   private cd:NgModel;
   private element:ElementRef;
+  private view:ViewContainerRef;
   private renderer:Renderer;
   private loader:DynamicComponentLoader;
 
@@ -154,11 +156,13 @@ export class Typeahead implements OnInit {
   }
 
   public constructor(cd:NgModel, element:ElementRef,
-                     renderer:Renderer, loader:DynamicComponentLoader) {
+                     renderer:Renderer, loader:DynamicComponentLoader,
+                     viewContainerRef:ViewContainerRef) {
     this.cd = cd;
     this.element = element;
     this.renderer = renderer;
     this.loader = loader;
+    this.view = viewContainerRef;
   }
 
   public ngOnInit():void {
@@ -210,12 +214,12 @@ export class Typeahead implements OnInit {
       animation: false
     });
 
-    let binding = Injector.resolve([
+    let binding = ReflectiveInjector.resolve([
       provide(TypeaheadOptions, {useValue: options})
     ]);
 
     this.popup = this.loader
-      .loadNextToLocation(TypeaheadContainer, this.element, binding)
+      .loadNextToLocation(TypeaheadContainer, this.view, binding)
       .then((componentRef:ComponentRef) => {
         componentRef.instance.position(this.element);
         this.container = componentRef.instance;
@@ -238,7 +242,7 @@ export class Typeahead implements OnInit {
   public hide():void {
     if (this.container) {
       this.popup.then((componentRef:ComponentRef) => {
-        componentRef.dispose();
+        componentRef.destroy();
         this.container = void 0;
         return componentRef;
       });

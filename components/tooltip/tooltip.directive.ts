@@ -1,6 +1,6 @@
 import {
   Directive, OnInit, Input, HostListener, ElementRef, DynamicComponentLoader,
-  ComponentRef, Provider, Injector
+  ComponentRef, Provider, ReflectiveInjector, ViewContainerRef
 } from 'angular2/core';
 import {TooltipOptions} from './tooltip-options.class';
 import {TooltipContainer} from './tooltip-container.component';
@@ -17,14 +17,17 @@ export class Tooltip implements OnInit {
   /* tslint:enable */
 
   public element:ElementRef;
+  public view: ViewContainerRef;
   public loader:DynamicComponentLoader;
 
   private visible:boolean = false;
   private tooltip:Promise<ComponentRef>;
 
-  public constructor(element:ElementRef, loader:DynamicComponentLoader) {
+  public constructor(element:ElementRef, loader:DynamicComponentLoader,
+                     viewContainerRef: ViewContainerRef) {
     this.element = element;
     this.loader = loader;
+    this.view = viewContainerRef;
   }
 
   public ngOnInit():void {
@@ -46,12 +49,12 @@ export class Tooltip implements OnInit {
       hostEl: this.element
     });
 
-    let binding = Injector.resolve([
+    let binding = ReflectiveInjector.resolve([
       new Provider(TooltipOptions, {useValue: options})
     ]);
 
     this.tooltip = this.loader
-      .loadNextToLocation(TooltipContainer, this.element, binding)
+      .loadNextToLocation(TooltipContainer, this.view, binding)
       .then((componentRef:ComponentRef) => {
         return componentRef;
       });
@@ -66,7 +69,7 @@ export class Tooltip implements OnInit {
     }
     this.visible = false;
     this.tooltip.then((componentRef:ComponentRef) => {
-      componentRef.dispose();
+      componentRef.destroy();
       return componentRef;
     });
   }

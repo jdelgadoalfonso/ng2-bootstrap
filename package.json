@@ -47,11 +47,11 @@
   },
   "homepage": "https://github.com/valor-software/ng2-bootstrap#readme",
   "dependencies": {
-    "angular2": "2.0.0-beta.15",
+    "angular2": "2.0.0-beta.16",
     "moment": "2.13.0"
   },
   "peerDependencies": {
-    "angular2": "2.0.0-beta.15"
+    "angular2": "2.0.0-beta.16"
   },
   "devDependencies": {
     "async": "1.5.2",
