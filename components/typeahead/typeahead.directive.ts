@@ -1,12 +1,16 @@
 import {
   Directive, Input, Output, HostListener, EventEmitter, OnInit, ElementRef,
-  Renderer, DynamicComponentLoader, ComponentRef, ReflectiveInjector, provide,
-  ViewContainerRef
+  Renderer, DynamicComponentLoader, ComponentRef, ReflectiveInjector, provide, ViewContainerRef
 } from 'angular2/core';
 import {NgModel} from 'angular2/common';
 import {TypeaheadUtils} from './typeahead-utils';
-import {TypeaheadContainer} from './typeahead-container.component';
+import {TypeaheadContainerComponent} from './typeahead-container.component';
 import {TypeaheadOptions} from './typeahead-options.class';
+
+import {global} from 'angular2/src/facade/lang';
+/* tslint:disable */
+const KeyboardEvent = (global as any).KeyboardEvent as KeyboardEvent;
+/* tslint:enable */
 
 // https://github.com/angular/angular/blob/master/modules/angular2/src/core/forms/directives/shared.ts
 function setProperty(renderer:Renderer, elementRef:ElementRef, propName:string, propValue:any):void {
@@ -16,7 +20,7 @@ function setProperty(renderer:Renderer, elementRef:ElementRef, propName:string, 
 @Directive({
   selector: '[typeahead][ngModel]'
 })
-export class Typeahead implements OnInit {
+export class TypeaheadDirective implements OnInit {
   @Output() public typeaheadLoading:EventEmitter<boolean> = new EventEmitter(false);
   @Output() public typeaheadNoResults:EventEmitter<boolean> = new EventEmitter(false);
   @Output() public typeaheadOnSelect:EventEmitter<{item:any}> = new EventEmitter(false);
@@ -41,7 +45,7 @@ export class Typeahead implements OnInit {
   // @Input() private typeaheadSelectOnBlur:boolean;
   // @Input() private typeaheadFocusOnSelect:boolean;
 
-  public container:TypeaheadContainer;
+  public container:TypeaheadContainerComponent;
   public isTypeaheadOptionsListActive:boolean = false;
 
   private debouncer:Function;
@@ -49,10 +53,9 @@ export class Typeahead implements OnInit {
   private placement:string = 'bottom-left';
   private popup:Promise<ComponentRef>;
 
-
   private cd:NgModel;
+  private viewContainerRef:ViewContainerRef;
   private element:ElementRef;
-  private view:ViewContainerRef;
   private renderer:Renderer;
   private loader:DynamicComponentLoader;
 
@@ -122,9 +125,7 @@ export class Typeahead implements OnInit {
 
   @HostListener('blur', ['$event.target'])
   protected onBlur():void {
-    console.log('blur')
     if (this.container && !this.container.isFocused) {
-      console.log('blur hide')
       this.hide();
     }
   }
@@ -155,14 +156,13 @@ export class Typeahead implements OnInit {
     }
   }
 
-  public constructor(cd:NgModel, element:ElementRef,
-                     renderer:Renderer, loader:DynamicComponentLoader,
-                     viewContainerRef:ViewContainerRef) {
-    this.cd = cd;
+  public constructor(cd:NgModel, viewContainerRef:ViewContainerRef, element:ElementRef,
+                     renderer:Renderer, loader:DynamicComponentLoader) {
     this.element = element;
+    this.cd = cd;
+    this.viewContainerRef = viewContainerRef;
     this.renderer = renderer;
     this.loader = loader;
-    this.view = viewContainerRef;
   }
 
   public ngOnInit():void {
@@ -219,9 +219,9 @@ export class Typeahead implements OnInit {
     ]);
 
     this.popup = this.loader
-      .loadNextToLocation(TypeaheadContainer, this.view, binding)
+      .loadNextToLocation(TypeaheadContainerComponent, this.viewContainerRef, binding)
       .then((componentRef:ComponentRef) => {
-        componentRef.instance.position(this.element);
+        componentRef.instance.position(this.viewContainerRef.element);
         this.container = componentRef.instance;
         this.container.parent = this;
         // This improves the speedas it won't have to be done for each list item

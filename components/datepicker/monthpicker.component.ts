@@ -1,28 +1,24 @@
 import {Component, OnInit} from 'angular2/core';
 import {CORE_DIRECTIVES, FORM_DIRECTIVES, NgClass} from 'angular2/common';
+import {DatePickerInnerComponent} from './datepicker-inner.component';
 import {Ng2BootstrapConfig} from '../ng2-bootstrap-config';
-import {DatePickerInner} from './datepicker-inner';
 
 // write an interface for template options
 const TEMPLATE_OPTIONS:any = {
   bs4: {
-    YEAR_BUTTON: `
+    MONTH_BUTTON: `
         <button type="button" style="min-width:100%;" class="btn btn-default"
                 [ngClass]="{'btn-info': dtz.selected, 'btn-link': !dtz.selected && !datePicker.isActive(dtz), 'btn-info': !dtz.selected && datePicker.isActive(dtz), disabled: dtz.disabled}"
                 [disabled]="dtz.disabled"
-                (click)="datePicker.select(dtz.date)" tabindex="-1">
-          <span [ngClass]="{'text-success': dtz.current}">{{dtz.label}}</span>
-        </button>
+                (click)="datePicker.select(dtz.date)" tabindex="-1"><span [ngClass]="{'text-success': dtz.current}">{{dtz.label}}</span></button>
     `
   },
   bs3: {
-    YEAR_BUTTON: `
+    MONTH_BUTTON: `
         <button type="button" style="min-width:100%;" class="btn btn-default"
                 [ngClass]="{'btn-info': dtz.selected, active: datePicker.isActive(dtz), disabled: dtz.disabled}"
                 [disabled]="dtz.disabled"
-                (click)="datePicker.select(dtz.date)" tabindex="-1">
-          <span [ngClass]="{'text-info': dtz.current}">{{dtz.label}}</span>
-        </button>
+                (click)="datePicker.select(dtz.date)" tabindex="-1"><span [ngClass]="{'text-info': dtz.current}">{{dtz.label}}</span></button>
     `
   }
 };
@@ -30,23 +26,22 @@ const TEMPLATE_OPTIONS:any = {
 const CURRENT_THEME_TEMPLATE:any = TEMPLATE_OPTIONS[Ng2BootstrapConfig.theme] || TEMPLATE_OPTIONS.bs3;
 
 @Component({
-  selector: 'yearpicker',
+  selector: 'monthpicker',
   template: `
-<table *ngIf="datePicker.datepickerMode==='year'" role="grid">
+<table *ngIf="datePicker.datepickerMode==='month'" role="grid">
   <thead>
     <tr>
       <th>
         <button type="button" class="btn btn-default btn-sm pull-left"
                 (click)="datePicker.move(-1)" tabindex="-1">
           <i class="glyphicon glyphicon-chevron-left"></i>
-        </button>
-      </th>
-      <th colspan="3">
-        <button [id]="uniqueId + '-title'" role="heading"
+        </button></th>
+      <th>
+        <button [id]="uniqueId + '-title'"
                 type="button" class="btn btn-default btn-sm"
                 (click)="datePicker.toggleMode()"
-                [disabled]="datePicker.datepickerMode === datePicker.maxMode"
-                [ngClass]="{disabled: datePicker.datepickerMode === datePicker.maxMode}" tabindex="-1" style="width:100%;">
+                [disabled]="datePicker.datepickerMode === maxMode"
+                [ngClass]="{disabled: datePicker.datepickerMode === maxMode}" tabindex="-1" style="width:100%;">
           <strong>{{title}}</strong>
         </button>
       </th>
@@ -59,9 +54,9 @@ const CURRENT_THEME_TEMPLATE:any = TEMPLATE_OPTIONS[Ng2BootstrapConfig.theme] ||
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let rowz of rows">
-      <td *ngFor="let dtz of rowz" class="text-center" role="gridcell">
-      ${CURRENT_THEME_TEMPLATE.YEAR_BUTTON}
+    <tr *ngFor="#rowz of rows">
+      <td *ngFor="#dtz of rowz" class="text-center" role="gridcell" id="{{dtz.uid}}" [ngClass]="dtz.customClass">
+        ${CURRENT_THEME_TEMPLATE.MONTH_BUTTON}
       </td>
     </tr>
   </tbody>
@@ -69,45 +64,44 @@ const CURRENT_THEME_TEMPLATE:any = TEMPLATE_OPTIONS[Ng2BootstrapConfig.theme] ||
   `,
   directives: [FORM_DIRECTIVES, CORE_DIRECTIVES, NgClass]
 })
-export class YearPicker implements OnInit {
-  public datePicker:DatePickerInner;
-  private title:string;
-  private rows:Array<any> = [];
+export class MonthPickerComponent implements OnInit {
+  public title:string;
+  public rows:Array<any> = [];
+  public datePicker:DatePickerInnerComponent;
 
-  public constructor(datePicker:DatePickerInner) {
+  public constructor(datePicker:DatePickerInnerComponent) {
     this.datePicker = datePicker;
   }
 
   public ngOnInit():void {
     let self = this;
 
-    this.datePicker.stepYear = {years: this.datePicker.yearRange};
+    this.datePicker.stepMonth = {years: 1};
 
     this.datePicker.setRefreshViewHandler(function ():void {
-      let years:Array<any> = new Array(this.yearRange);
+      let months:Array<any> = new Array(12);
+      let year:number = this.activeDate.getFullYear();
       let date:Date;
 
-      for (let i = 0, start = self.getStartingYear(this.activeDate.getFullYear()); i < this.yearRange; i++) {
-        date = new Date(start + i, 0, 1);
+      for (let i = 0; i < 12; i++) {
+        date = new Date(year, i, 1);
         date = this.fixTimeZone(date);
-        years[i] = this.createDateObject(date, this.formatYear);
-        years[i].uid = this.uniqueId + '-' + i;
+        months[i] = this.createDateObject(date, this.formatMonth);
+        months[i].uid = this.uniqueId + '-' + i;
       }
 
-      self.title = [years[0].label,
-        years[this.yearRange - 1].label].join(' - ');
-      self.rows = this.split(years, 5);
-    }, 'year');
+      self.title = this.dateFilter(this.activeDate, this.formatMonthTitle);
+      self.rows = this.split(months, 3);
+    }, 'month');
 
     this.datePicker.setCompareHandler(function (date1:Date, date2:Date):number {
-      return date1.getFullYear() - date2.getFullYear();
-    }, 'year');
+      let d1 = new Date(date1.getFullYear(), date1.getMonth());
+      let d2 = new Date(date2.getFullYear(), date2.getMonth());
+      return d1.getTime() - d2.getTime();
+    }, 'month');
 
     this.datePicker.refreshView();
   }
 
-  private getStartingYear(year:number):number {
-    // todo: parseInt
-    return ((year - 1) / this.datePicker.yearRange) * this.datePicker.yearRange + 1;
-  }
+  // todo: key events implementation
 }

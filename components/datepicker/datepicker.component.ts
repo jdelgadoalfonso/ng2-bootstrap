@@ -1,11 +1,9 @@
 import {Component, Self, Input} from 'angular2/core';
-import {
-  CORE_DIRECTIVES, FORM_DIRECTIVES, ControlValueAccessor, NgModel
-} from 'angular2/common';
-import {DatePickerInner} from './datepicker-inner';
-import {DayPicker} from './daypicker';
-import {MonthPicker} from './monthpicker';
-import {YearPicker} from './yearpicker';
+import {CORE_DIRECTIVES, FORM_DIRECTIVES, ControlValueAccessor, NgModel} from 'angular2/common';
+import {DatePickerInnerComponent} from './datepicker-inner.component';
+import {DayPickerComponent} from './daypicker.component';
+import {MonthPickerComponent} from './monthpicker.component';
+import {YearPickerComponent} from './yearpicker.component';
 // import {DatePickerPopup} from './datepicker-popup';
 
 /* tslint:disable:component-selector-name component-selector-type */
@@ -39,11 +37,11 @@ import {YearPicker} from './yearpicker';
       <yearpicker tabindex="0"></yearpicker>
     </datepicker-inner>
     `,
-  directives: [DatePickerInner, DayPicker, MonthPicker, YearPicker,
+  directives: [DatePickerInnerComponent, DayPickerComponent, MonthPickerComponent, YearPickerComponent,
     FORM_DIRECTIVES, CORE_DIRECTIVES]
 })
 /* tslint:enable:component-selector-name component-selector-type */
-export class DatePicker implements ControlValueAccessor {
+export class DatePickerComponent implements ControlValueAccessor {
   @Input() public datepickerMode:string;
   @Input() public initDate:Date;
   @Input() public minDate:Date;
@@ -65,7 +63,11 @@ export class DatePicker implements ControlValueAccessor {
 // todo: change type during implementation
   @Input() public dateDisabled:any;
 
+  public onChange:any = Function.prototype;
+  public onTouched:any = Function.prototype;
+
   public cd:NgModel;
+  private _now:Date = new Date();
   private _activeDate:Date;
 
   @Input()
@@ -78,8 +80,6 @@ export class DatePicker implements ControlValueAccessor {
     // hack
     cd.valueAccessor = this;
   }
-
-  private _now:Date = new Date();
 
   public set activeDate(value:Date) {
     this._activeDate = value;
@@ -110,9 +110,6 @@ export class DatePicker implements ControlValueAccessor {
 
     this.activeDate = value ? new Date(value) : void 0;
   }
-
-  public onChange:any = () => {};
-  public onTouched:any = () => {};
 
   public registerOnChange(fn:(_:any) => {}):void { this.onChange = fn; }
 

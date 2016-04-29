@@ -4,13 +4,16 @@ import {
 import {ControlValueAccessor, NgModel} from 'angular2/common';
 
 @Directive({selector: '[btnCheckbox][ngModel]'})
-export class ButtonCheckbox implements ControlValueAccessor, OnInit {
+export class ButtonCheckboxDirective implements ControlValueAccessor, OnInit {
   public cd:NgModel;
   @Input() public btnCheckboxTrue:any;
 
   @Input() public btnCheckboxFalse:any;
   @HostBinding('class.active')
   public state:boolean = false;
+
+  protected onChange:any = Function.prototype;
+  protected onTouched:any = Function.prototype;
 
   private value:any;
 
@@ -54,9 +57,6 @@ export class ButtonCheckbox implements ControlValueAccessor, OnInit {
     this.state = this.trueValue === value;
     this.value = value;
   }
-
-  protected onChange:any = () => {};
-  protected onTouched:any = () => {};
 
   public registerOnChange(fn:(_:any) => {}):void {
     this.onChange = fn;

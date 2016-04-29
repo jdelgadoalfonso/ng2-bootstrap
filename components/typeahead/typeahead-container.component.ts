@@ -1,7 +1,7 @@
 import {Component, ElementRef, ViewEncapsulation} from 'angular2/core';
 import {CORE_DIRECTIVES} from 'angular2/common';
 import {TypeaheadUtils} from './typeahead-utils';
-import {Typeahead} from './typeahead.directive';
+import {TypeaheadDirective} from './typeahead.directive';
 import {TypeaheadOptions} from './typeahead-options.class';
 import {positionService} from '../position';
 import {Ng2BootstrapConfig, Ng2BootstrapTheme} from '../ng2-bootstrap-config';
@@ -39,8 +39,8 @@ const TEMPLATE:any = {
   template: TEMPLATE[Ng2BootstrapConfig.theme],
   encapsulation: ViewEncapsulation.None
 })
-export class TypeaheadContainer {
-  public parent:Typeahead;
+export class TypeaheadContainerComponent {
+  public parent:TypeaheadDirective;
   public query:any;
   public element:ElementRef;
   public isFocused:boolean = false;
@@ -139,6 +139,10 @@ export class TypeaheadContainer {
     return itemStr;
   }
 
+  protected focusLost():void {
+    this.isFocused = false;
+  }
+
   public isActive(value:any):boolean {
     return this._active === value;
   }
@@ -153,9 +157,5 @@ export class TypeaheadContainer {
       item: value
     });
     return false;
-  }
-
-  private focusLost():void {
-    this.isFocused = false;
   }
 }

@@ -3,6 +3,11 @@ import {
 } from 'angular2/core';
 import {NgFor, ControlValueAccessor, NgModel} from 'angular2/common';
 
+import {global} from 'angular2/src/facade/lang';
+/* tslint:disable */
+const KeyboardEvent = (global as any).KeyboardEvent as KeyboardEvent;
+/* tslint:enable */
+
 @Component({
   /* tslint:disable */
   selector: 'rating[ngModel]',
@@ -17,7 +22,7 @@ import {NgFor, ControlValueAccessor, NgModel} from 'angular2/common';
     </span>
   `
 })
-export class Rating implements ControlValueAccessor, OnInit {
+export class RatingComponent implements ControlValueAccessor, OnInit {
   @Input() public max:number;
   @Input() public stateOn:string;
   @Input() public stateOff:string;
@@ -27,6 +32,9 @@ export class Rating implements ControlValueAccessor, OnInit {
 
   @Output() public onHover:EventEmitter<number> = new EventEmitter(false);
   @Output() public onLeave:EventEmitter<number> = new EventEmitter(false);
+
+  public onChange:any = Function.prototype;
+  public onTouched:any = Function.prototype;
 
   public cd:NgModel;
   private range:Array<any>;
@@ -88,10 +96,6 @@ export class Rating implements ControlValueAccessor, OnInit {
     this.value = this.preValue;
     this.onLeave.emit(this.value);
   }
-
-  public onChange:any = () => {};
-
-  public onTouched:any = () => {};
 
   public registerOnChange(fn:(_:any) => {}):void {this.onChange = fn;}
 

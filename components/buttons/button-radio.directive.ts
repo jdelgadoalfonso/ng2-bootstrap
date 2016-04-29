@@ -4,9 +4,12 @@ import {
 import {ControlValueAccessor, NgModel} from 'angular2/common';
 
 @Directive({selector: '[btnRadio][ngModel]'})
-export class ButtonRadio implements ControlValueAccessor, OnInit {
+export class ButtonRadioDirective implements ControlValueAccessor, OnInit {
   public cd:NgModel;
   public el:ElementRef;
+
+  public onChange:any = Function.prototype;
+  public onTouched:any = Function.prototype;
 
   @Input() private btnRadio:string;
   @Input() private uncheckable:boolean;
@@ -50,9 +53,6 @@ export class ButtonRadio implements ControlValueAccessor, OnInit {
   public writeValue(value:any):void {
     this.value = value;
   }
-
-  public onChange:any = () => {};
-  public onTouched:any = () => {};
 
   public registerOnChange(fn:(_:any) => {}):void {
     this.onChange = fn;

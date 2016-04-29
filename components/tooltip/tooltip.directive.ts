@@ -1,12 +1,12 @@
 import {
-  Directive, OnInit, Input, HostListener, ElementRef, DynamicComponentLoader,
+  Directive, Input, HostListener, DynamicComponentLoader,
   ComponentRef, Provider, ReflectiveInjector, ViewContainerRef
 } from 'angular2/core';
 import {TooltipOptions} from './tooltip-options.class';
-import {TooltipContainer} from './tooltip-container.component';
+import {TooltipContainerComponent} from './tooltip-container.component';
 
 @Directive({selector: '[tooltip]'})
-export class Tooltip implements OnInit {
+export class TooltipDirective {
   /* tslint:disable */
   @Input('tooltip') public content:string;
   @Input('tooltipPlacement') public placement:string = 'top';
@@ -16,21 +16,15 @@ export class Tooltip implements OnInit {
   @Input('tooltipAppendToBody') public appendToBody:boolean;
   /* tslint:enable */
 
-  public element:ElementRef;
-  public view: ViewContainerRef;
+  public viewContainerRef:ViewContainerRef;
   public loader:DynamicComponentLoader;
 
   private visible:boolean = false;
   private tooltip:Promise<ComponentRef>;
 
-  public constructor(element:ElementRef, loader:DynamicComponentLoader,
-                     viewContainerRef: ViewContainerRef) {
-    this.element = element;
+  public constructor(viewContainerRef:ViewContainerRef, loader:DynamicComponentLoader) {
+    this.viewContainerRef = viewContainerRef;
     this.loader = loader;
-    this.view = viewContainerRef;
-  }
-
-  public ngOnInit():void {
   }
 
   // todo: filter triggers
@@ -46,7 +40,7 @@ export class Tooltip implements OnInit {
       content: this.content,
       placement: this.placement,
       animation: this.animation,
-      hostEl: this.element
+      hostEl: this.viewContainerRef.element
     });
 
     let binding = ReflectiveInjector.resolve([
@@ -54,7 +48,7 @@ export class Tooltip implements OnInit {
     ]);
 
     this.tooltip = this.loader
-      .loadNextToLocation(TooltipContainer, this.view, binding)
+      .loadNextToLocation(TooltipContainerComponent, this.viewContainerRef, binding)
       .then((componentRef:ComponentRef) => {
         return componentRef;
       });

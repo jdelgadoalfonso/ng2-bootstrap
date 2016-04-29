@@ -1,12 +1,12 @@
-import {Component, OnInit, Input} from 'angular2/core';
+import {Component, OnInit, OnDestroy, HostBinding, Input} from 'angular2/core';
 import {NgClass} from 'angular2/common';
-import {NgTransclude} from '../common';
-import {Tab} from './tab.directive';
+import {NgTranscludeDirective} from '../common';
+import {TabDirective} from './tab.directive';
 // todo: add active event to tab
 // todo: fix? mixing static and dynamic tabs position tabs in order of creation
 @Component({
   selector: 'tabset',
-  directives: [NgClass, NgTransclude],
+  directives: [NgClass, NgTranscludeDirective],
   template: `
     <ul class="nav" [ngClass]="classMap" (click)="$event.preventDefault()">
         <li *ngFor="let tabz of tabs" class="nav-item"
@@ -26,7 +26,7 @@ import {Tab} from './tab.directive';
     </div>
   `
 })
-export class Tabset implements OnInit {
+export class TabsetComponent implements OnInit, OnDestroy {
   @Input()
   public get vertical():boolean { return this._vertical;};
 
@@ -35,6 +35,8 @@ export class Tabset implements OnInit {
 
   @Input()
   public get type():string {return this._type;};
+
+  @HostBinding('class.tab-container') protected clazz:boolean = true;
 
   public set vertical(value:boolean) {
     this._vertical = value;
@@ -51,16 +53,13 @@ export class Tabset implements OnInit {
     this.setClassMap();
   }
 
-  public tabs:Array<Tab> = [];
+  public tabs:Array<TabDirective> = [];
 
   private isDestroyed:boolean;
   private _vertical:boolean;
   private _justified:boolean;
   private _type:string;
   private classMap:any = {};
-
-  public constructor() {
-  }
 
   public ngOnInit():void {
     this.type = this.type !== 'undefined' ? this.type : 'tabs';
@@ -70,12 +69,12 @@ export class Tabset implements OnInit {
     this.isDestroyed = true;
   }
 
-  public addTab(tab:Tab):void {
+  public addTab(tab:TabDirective):void {
     this.tabs.push(tab);
     tab.active = this.tabs.length === 1 && tab.active !== false;
   }
 
-  public removeTab(tab:Tab):void {
+  public removeTab(tab:TabDirective):void {
     let index = this.tabs.indexOf(tab);
     if (index === -1 || this.isDestroyed) {
       return;

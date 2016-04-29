@@ -1,14 +1,13 @@
 import {
-  Component, Directive, OnInit, EventEmitter, ComponentRef, ViewEncapsulation,
-  ElementRef, DynamicComponentLoader, Self, Renderer, bind, ReflectiveInjector,
-  ViewContainerRef
+  Component, Directive, EventEmitter, ComponentRef, ViewEncapsulation,
+  ElementRef, DynamicComponentLoader, Self, Renderer, ReflectiveInjector, provide, ViewContainerRef
 } from 'angular2/core';
 import {
   CORE_DIRECTIVES, FORM_DIRECTIVES, NgClass, NgModel, NgStyle
 } from 'angular2/common';
-import {IAttribute} from '../common';
+import {KeyAttribute} from '../common';
 import {positionService} from '../position';
-import {DatePicker} from './datepicker';
+import {DatePickerComponent} from './datepicker.component';
 
 // import {DatePickerInner} from './datepicker-inner';
 // import {DayPicker} from './daypicker';
@@ -25,7 +24,7 @@ class PopupOptions {
   }
 }
 
-const datePickerPopupConfig:IAttribute = {
+const datePickerPopupConfig:KeyAttribute = {
   datepickerPopup: 'YYYY-MM-dd',
   currentText: 'Today',
   clearText: 'Clear',
@@ -54,12 +53,11 @@ const datePickerPopupConfig:IAttribute = {
             <button type="button" class="btn btn-sm btn-success pull-right" (click)="close()">{{ getText('close') }}</button>
         </li>
     </ul>`,
-  directives: [NgClass, NgStyle, DatePicker, FORM_DIRECTIVES, CORE_DIRECTIVES],
+  directives: [NgClass, NgStyle, DatePickerComponent, FORM_DIRECTIVES, CORE_DIRECTIVES],
   encapsulation: ViewEncapsulation.None
 })
-
-class PopupContainer {
-  public popupComp:DatePickerPopup;
+class PopupContainerComponent {
+  public popupComp:DatePickerPopupDirective;
 
   private classMap:any;
   private top:string;
@@ -106,7 +104,7 @@ class PopupContainer {
   }
 
   public getText(key:string):string {
-    return (<IAttribute>this)[key + 'Text'] || datePickerPopupConfig[key + 'Text'];
+    return (this as KeyAttribute)[key + 'Text'] || datePickerPopupConfig[key + 'Text'];
   }
 
   public isDisabled(/*date:Date*/):boolean {
@@ -120,10 +118,9 @@ class PopupContainer {
   properties: ['datepickerPopup', 'isOpen']/*,
    host: {'(cupdate)': 'onUpdate1($event)'}*/
 })
-export class DatePickerPopup implements OnInit {
+export class DatePickerPopupDirective {
   public cd:NgModel;
-  public element:ElementRef;
-  public view:ViewContainerRef;
+  public viewContainerRef:ViewContainerRef;
   public renderer:Renderer;
   public loader:DynamicComponentLoader;
 
@@ -132,15 +129,13 @@ export class DatePickerPopup implements OnInit {
   private placement:string = 'bottom';
   private popup:Promise<ComponentRef>;
 
-  public constructor(@Self() cd:NgModel, element:ElementRef,
-                     renderer:Renderer, loader:DynamicComponentLoader,
-                     viewContainerRef: ViewContainerRef) {
+  public constructor(@Self() cd:NgModel, viewContainerRef:ViewContainerRef,
+                     renderer:Renderer, loader:DynamicComponentLoader) {
     this.cd = cd;
-    this.element = element;
+    this.viewContainerRef = viewContainerRef;
     this.renderer = renderer;
     this.loader = loader;
     this.activeDate = cd.model;
-    this.view = viewContainerRef;
   }
 
   public get activeDate():Date {
@@ -169,9 +164,6 @@ export class DatePickerPopup implements OnInit {
     }
   }
 
-  public ngOnInit():void {
-  }
-
   public hide(cb:Function):void {
     if (this.popup) {
       this.popup.then((componentRef:ComponentRef) => {
@@ -190,13 +182,13 @@ export class DatePickerPopup implements OnInit {
     });
 
     let binding = ReflectiveInjector.resolve([
-      bind(PopupOptions).toValue(options)
+      provide(PopupOptions, {useValue: options})
     ]);
 
     this.popup = this.loader
-      .loadNextToLocation(PopupContainer, this.view, binding)
+      .loadNextToLocation(PopupContainerComponent, this.viewContainerRef, binding)
       .then((componentRef:ComponentRef) => {
-        componentRef.instance.position(this.element);
+        componentRef.instance.position(this.viewContainerRef);
         componentRef.instance.popupComp = this;
         /*componentRef.instance.update1.observer({
          next: (newVal) => {

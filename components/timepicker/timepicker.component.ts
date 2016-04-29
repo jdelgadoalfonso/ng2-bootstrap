@@ -1,7 +1,7 @@
 import {Component, OnInit, Input, Self} from 'angular2/core';
 import {NgClass, NgModel, ControlValueAccessor} from 'angular2/common';
 
-export interface ITimepickerConfig {
+export interface TimepickerConfig {
   hourStep:number;
   minuteStep:number;
   showMeridian:boolean;
@@ -20,7 +20,7 @@ export interface ITimepickerConfig {
 // todo: implement `time` validator
 // todo: replace increment/decrement blockers with getters, or extract
 // todo: unify work with selected
-export const timepickerConfig:ITimepickerConfig = {
+export const timepickerConfig:TimepickerConfig = {
   hourStep: 1,
   minuteStep: 1,
   showMeridian: true,
@@ -82,7 +82,7 @@ function addMinutes(date:any, minutes:number):Date {
     </table>
   `
 })
-export class Timepicker implements ControlValueAccessor, OnInit {
+export class TimepickerComponent implements ControlValueAccessor, OnInit {
   public cd:NgModel;
   // config
   @Input() public hourStep:number;
@@ -115,6 +115,9 @@ export class Timepicker implements ControlValueAccessor, OnInit {
      this.refresh();
      }*/
   }
+
+  public onChange:any = Function.prototype;
+  public onTouched:any = Function.prototype;
 
   // result value
   private _selected:Date = new Date();
@@ -184,10 +187,6 @@ export class Timepicker implements ControlValueAccessor, OnInit {
     }
     this.selected = v ? new Date(v) : void 0;
   }
-
-  public onChange:any = () => {};
-
-  public onTouched:any = () => {};
 
   public registerOnChange(fn:(_:any) => {}):void {this.onChange = fn;}
 

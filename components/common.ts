@@ -1,6 +1,6 @@
 import {Directive, TemplateRef, ViewContainerRef, Inject} from 'angular2/core';
 
-export interface IAttribute {
+export interface KeyAttribute {
   [key:string]:any;
 }
 
@@ -8,7 +8,7 @@ export interface IAttribute {
   selector: '[ngTransclude]',
   properties: ['ngTransclude']
 })
-export class NgTransclude {
+export class NgTranscludeDirective {
   public viewRef:ViewContainerRef;
 
   private _ngTransclude:TemplateRef;

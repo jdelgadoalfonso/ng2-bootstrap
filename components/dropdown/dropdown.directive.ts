@@ -5,7 +5,7 @@ import {
 import {dropdownService, NONINPUT} from './dropdown.service';
 
 @Directive({selector: '[dropdown]'})
-export class Dropdown implements OnInit, OnDestroy {
+export class DropdownDirective implements OnInit, OnDestroy {
   @HostBinding('class.open')
   @Input()
   public get isOpen():boolean {
@@ -41,9 +41,9 @@ export class Dropdown implements OnInit, OnDestroy {
     this._isOpen = !!value;
 
     // todo: implement after porting position
-    if (this.appendToBody && this.menuEl) {
-
-    }
+    // if (this.appendToBody && this.menuEl) {
+    //
+    // }
 
     // todo: $animate open<->close transitions, as soon as ng2Animate will be
     // ready
