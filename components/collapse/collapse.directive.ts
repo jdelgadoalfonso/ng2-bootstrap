@@ -43,6 +43,7 @@ export class CollapseDirective implements OnInit {
   private _ab:AnimationBuilder;
   private _el:ElementRef;
   private _renderer:Renderer;
+  private _firstShot: boolean = true;
 
   public constructor(_ab:AnimationBuilder, _el:ElementRef, _renderer: Renderer) {
     this._ab = _ab;
@@ -61,6 +62,7 @@ export class CollapseDirective implements OnInit {
     } else {
       this.show();
     }
+    this._firstShot = false;
   }
 
   public hide():void {
@@ -70,7 +72,8 @@ export class CollapseDirective implements OnInit {
     this.isExpanded = false;
     this.isCollapsed = true;
 
-    setTimeout(() => {
+    if (!this._firstShot) {
+      setTimeout(() => {
         // this.height = '0';
         // this.isCollapse = true;
         // this.isCollapsing = false;
@@ -93,6 +96,11 @@ export class CollapseDirective implements OnInit {
             this.isCollapsing = false;
           });
       }, 4);
+    } else {
+      this.display = 'none';
+      this.isCollapse = true;
+      this.isCollapsing = false;
+    }
   }
 
   public show():void {
