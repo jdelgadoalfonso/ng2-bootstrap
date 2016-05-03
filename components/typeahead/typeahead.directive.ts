@@ -21,9 +21,9 @@ function setProperty(renderer:Renderer, elementRef:ElementRef, propName:string, 
   selector: '[typeahead][ngModel]'
 })
 export class TypeaheadDirective implements OnInit {
-  @Output() public typeaheadLoading:EventEmitter<boolean> = new EventEmitter(false);
-  @Output() public typeaheadNoResults:EventEmitter<boolean> = new EventEmitter(false);
-  @Output() public typeaheadOnSelect:EventEmitter<{item:any}> = new EventEmitter(false);
+  @Output() public typeaheadLoading:EventEmitter<boolean> = new EventEmitter<boolean>(false);
+  @Output() public typeaheadNoResults:EventEmitter<boolean> = new EventEmitter<boolean>(false);
+  @Output() public typeaheadOnSelect:EventEmitter<{item:any}> = new EventEmitter<{item:any}>(false);
 
   @Input() public typeahead:any;
   @Input() public typeaheadMinLength:number = void 0;
