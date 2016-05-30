@@ -1,7 +1,7 @@
 import {
   Component, ChangeDetectorRef, ElementRef, Inject, AfterViewInit
-} from 'angular2/core';
-import {NgClass, NgStyle} from 'angular2/common';
+} from '@angular/core';
+import {NgClass, NgStyle} from '@angular/common';
 import {positionService} from '../position';
 import {TooltipOptions} from './tooltip-options.class';
 
@@ -44,6 +44,7 @@ export class TooltipContainerComponent implements AfterViewInit {
     Object.assign(this, options);
     this.classMap = {'in': false, 'fade': false};
     this.classMap[options.placement] = true;
+    this.classMap['tooltip-' + options.placement] = true;
   }
 
   public ngAfterViewInit():void {

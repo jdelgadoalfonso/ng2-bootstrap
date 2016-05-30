@@ -1,7 +1,7 @@
 // todo: add animate
 
-import {Component, OnDestroy, Input} from 'angular2/core';
-import {NgFor} from 'angular2/common';
+import {Component, OnDestroy, Input} from '@angular/core';
+import {NgFor} from '@angular/common';
 import {Ng2BootstrapConfig, Ng2BootstrapTheme} from '../ng2-bootstrap-config';
 import {SlideComponent} from './slide.component';
 

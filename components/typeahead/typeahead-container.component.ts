@@ -1,5 +1,5 @@
-import {Component, ElementRef, ViewEncapsulation} from 'angular2/core';
-import {CORE_DIRECTIVES} from 'angular2/common';
+import {Component, ElementRef, ViewEncapsulation} from '@angular/core';
+import {CORE_DIRECTIVES} from '@angular/common';
 import {TypeaheadUtils} from './typeahead-utils';
 import {TypeaheadDirective} from './typeahead.directive';
 import {TypeaheadOptions} from './typeahead-options.class';

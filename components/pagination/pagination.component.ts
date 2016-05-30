@@ -1,7 +1,7 @@
 import {
   Component, OnInit, Input, Output, ElementRef, EventEmitter, Self, Renderer
-} from 'angular2/core';
-import {NgFor, NgIf, ControlValueAccessor, NgModel} from 'angular2/common';
+} from '@angular/core';
+import {NgFor, NgIf, ControlValueAccessor, NgModel} from '@angular/common';
 import {KeyAttribute} from '../common';
 
 // todo: extract base functionality classes
