@@ -1,6 +1,6 @@
-import {Component, OnInit, ElementRef, Renderer, Self} from '@angular/core';
+import {Component, AfterContentInit, ElementRef, Renderer, Self} from '@angular/core';
 import {NgModel, NgClass} from '@angular/common';
-import {PaginationComponent} from './pagination.component';
+import {PAGINATION_VALUE_ACCESSOR, PaginationComponent} from './pagination.component';
 
 const pagerConfig = {
   itemsPerPage: 10,
@@ -22,9 +22,10 @@ const PAGER_TEMPLATE = `
 
 /* tslint:disable */
 @Component({
-  selector: 'pager[ngModel]',
+  selector: 'pager, pager[ngModel]',
   template: PAGER_TEMPLATE,
   directives: [NgClass],
+  providers: [PAGINATION_VALUE_ACCESSOR],
   inputs: [
     'align',
     'totalItems', 'itemsPerPage',
@@ -32,10 +33,10 @@ const PAGER_TEMPLATE = `
   ]
 })
 /* tslint:enable */
-export class PagerComponent extends PaginationComponent implements OnInit {
+export class PagerComponent extends PaginationComponent implements AfterContentInit {
   public config:any = pagerConfig;
 
-  public constructor(@Self() cd:NgModel, renderer:Renderer, elementRef:ElementRef) {
-    super(cd, renderer, elementRef);
+  public constructor(renderer:Renderer, elementRef:ElementRef) {
+    super(renderer, elementRef);
   }
 }
