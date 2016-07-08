@@ -50,7 +50,7 @@
   },
   "homepage": "https://github.com/valor-software/ng2-bootstrap#readme",
   "dependencies": {
-    "moment": "2.13.0"
+    "moment": "2.14.1"
   },
   "peerDependencies": {
     "@angular/common": "2.0.0-rc.4",
@@ -91,9 +91,9 @@
     "html-webpack-plugin": "2.22.0",
     "istanbul-instrumenter-loader": "0.2.0",
     "jasmine": "2.4.1",
-    "karma": "1.1.0",
+    "karma": "1.1.1",
     "karma-chrome-launcher": "1.0.1",
-    "karma-coverage": "1.0.0",
+    "karma-coverage": "1.1.0",
     "karma-jasmine": "1.0.2",
     "karma-phantomjs-launcher": "1.0.1",
     "karma-sourcemap-loader": "0.3.7",
