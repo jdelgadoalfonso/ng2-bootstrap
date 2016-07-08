@@ -23,10 +23,9 @@ const PAGER_TEMPLATE = `
 
 /* tslint:disable */
 @Component({
-  selector: 'pager, pager[ngModel]',
+  selector: 'pager[ngModel]',
   template: PAGER_TEMPLATE,
   directives: [NgClass],
-  providers: [PAGINATION_VALUE_ACCESSOR],
   inputs: [
     'align',
     'totalItems', 'itemsPerPage',
@@ -34,10 +33,10 @@ const PAGER_TEMPLATE = `
   ]
 })
 /* tslint:enable */
-export class PagerComponent extends PaginationComponent implements AfterContentInit {
+export class PagerComponent extends PaginationComponent implements OnInit {
   public config:any = pagerConfig;
 
-  public constructor(renderer:Renderer, elementRef:ElementRef) {
-    super(renderer, elementRef);
+  public constructor(@Self() cd:NgModel, renderer:Renderer, elementRef:ElementRef) {
+    super(cd, renderer, elementRef);
   }
 }

@@ -1,15 +1,9 @@
 import {
-  Component, AfterContentInit, Input, Output, ElementRef, EventEmitter, Self, Renderer, Provider, forwardRef
+  Component, OnInit, Input, Output, ElementRef, EventEmitter, Self, Renderer
 } from '@angular/core';
 import {NgFor, NgIf} from '@angular/common';
 import {ControlValueAccessor, NgModel} from '@angular/forms';
 import {KeyAttribute} from '../common';
-
-export const PAGINATION_VALUE_ACCESSOR: any = {
-  provide: NG_VALUE_ACCESSOR,
-  useExisting: forwardRef(() => PaginationComponent),
-  multi: true
-};
 
 // todo: extract base functionality classes
 // todo: expose an option to change default configuration
@@ -79,13 +73,12 @@ const PAGINATION_TEMPLATE = `
 
 /* tslint:disable */
 @Component({
-  selector: 'pagination,pagination[ngModel]',
+  selector: 'pagination[ngModel]',
   template: PAGINATION_TEMPLATE,
-  directives: [NgFor, NgIf],
-  providers: [PAGINATION_VALUE_ACCESSOR]
+  directives: [NgFor, NgIf]
 })
 /* tslint:enable */
-export class PaginationComponent implements ControlValueAccessor, AfterContentInit, PaginationConfig, KeyAttribute {
+export class PaginationComponent implements ControlValueAccessor, OnInit, PaginationConfig, KeyAttribute {
   public config:any;
   @Input() public maxSize:number;
 
@@ -113,7 +106,7 @@ export class PaginationComponent implements ControlValueAccessor, AfterContentIn
     this.totalPages = this.calculateTotalPages();
   }
 
-  @Input('totalItems')
+  @Input()
   public get totalItems():number {
     return this._totalItems;
   }
@@ -156,6 +149,7 @@ export class PaginationComponent implements ControlValueAccessor, AfterContentIn
   public onChange:any = Function.prototype;
   public onTouched:any = Function.prototype;
 
+  public cd:NgModel;
   public renderer:Renderer;
   public elementRef:ElementRef;
 
@@ -169,13 +163,15 @@ export class PaginationComponent implements ControlValueAccessor, AfterContentIn
   private _page:number;
   private pages:Array<any>;
 
-  public constructor(renderer:Renderer, elementRef:ElementRef) {
+  public constructor(@Self() cd:NgModel, renderer:Renderer, elementRef:ElementRef) {
+    this.cd = cd;
     this.renderer = renderer;
     this.elementRef = elementRef;
+    cd.valueAccessor = this;
     this.config = this.config || paginationConfig;
   }
 
-  public ngAfterContentInit():void {
+  public ngOnInit():void {
     this.classMap = this.elementRef.nativeElement.getAttribute('class') || '';
     // watch for maxSize
     this.maxSize = typeof this.maxSize !== 'undefined'
@@ -198,6 +194,7 @@ export class PaginationComponent implements ControlValueAccessor, AfterContentIn
     this.totalPages = this.calculateTotalPages();
     // this class
     this.pages = this.getPages(this.page, this.totalPages);
+    this.page = this.cd.value;
     this.inited = true;
   }
 
@@ -233,6 +230,7 @@ export class PaginationComponent implements ControlValueAccessor, AfterContentIn
         target.blur();
       }
       this.writeValue(page);
+      this.cd.viewToModelUpdate(this.page);
     }
   }
 
