@@ -1,7 +1,8 @@
 import {
   Component, AfterContentInit, Input, Output, ElementRef, EventEmitter, Self, Renderer, Provider, forwardRef
 } from '@angular/core';
-import {NG_VALUE_ACCESSOR, CORE_DIRECTIVES, NgFor, NgIf, ControlValueAccessor, NgModel} from '@angular/common';
+import {NgFor, NgIf} from '@angular/common';
+import {ControlValueAccessor, NgModel} from '@angular/forms';
 import {KeyAttribute} from '../common';
 
 export const PAGINATION_VALUE_ACCESSOR: any = {
