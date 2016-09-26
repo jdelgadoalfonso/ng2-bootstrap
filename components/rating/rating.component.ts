@@ -1,19 +1,12 @@
 import {
-  Component, OnInit, Input, Output, HostListener, Self, EventEmitter
+  Component, EventEmitter, HostListener, Input, OnInit, Output, Self
 } from '@angular/core';
-import {NgFor} from '@angular/common';
-import {ControlValueAccessor, NgModel} from '@angular/forms';
-
-import {global} from '@angular/core/src/facade/lang';
-/* tslint:disable */
-const KeyboardEvent = (global as any).KeyboardEvent as KeyboardEvent;
-/* tslint:enable */
+import { ControlValueAccessor, NgModel } from '@angular/forms';
 
 @Component({
   /* tslint:disable */
   selector: 'rating[ngModel]',
   /* tslint:enable */
-  directives: [NgFor],
   template: `
     <span (mouseleave)="reset()" (keydown)="onKeydown($event)" tabindex="0" role="slider" aria-valuemin="0" [attr.aria-valuemax]="range.length" [attr.aria-valuenow]="value">
       <template ngFor let-r [ngForOf]="range" let-index="index">
@@ -21,7 +14,8 @@ const KeyboardEvent = (global as any).KeyboardEvent as KeyboardEvent;
         <i (mouseenter)="enter(index + 1)" (click)="rate(index + 1)" class="glyphicon" [ngClass]="index < value ? r.stateOn : r.stateOff" [title]="r.title" ></i>
       </template>
     </span>
-  `
+  `,
+  providers: [NgModel]
 })
 export class RatingComponent implements ControlValueAccessor, OnInit {
   @Input() public max:number;
@@ -98,9 +92,13 @@ export class RatingComponent implements ControlValueAccessor, OnInit {
     this.onLeave.emit(this.value);
   }
 
-  public registerOnChange(fn:(_:any) => {}):void {this.onChange = fn;}
+  public registerOnChange(fn:(_:any) => {}):void {
+    this.onChange = fn;
+  }
 
-  public registerOnTouched(fn:() => {}):void {this.onTouched = fn;}
+  public registerOnTouched(fn:() => {}):void {
+    this.onTouched = fn;
+  }
 
   private buildTemplateObjects(ratingStates:Array<any>, max:number):Array<any> {
     ratingStates = ratingStates || [];
